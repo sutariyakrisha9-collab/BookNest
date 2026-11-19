@@ -15,14 +15,12 @@ import {
 } from "lucide-react";
 
 function Favorites() {
+
     const [user, setUser] = useState({});
     const [favorites, setFavorites] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [refresh, setRefresh] = useState(0);
-
-    const API_URL =
-        import.meta.env.VITE_API_URL || "http://localhost:5000";
 
     // Load User
     useEffect(() => {
@@ -55,12 +53,14 @@ function Favorites() {
                     err.response?.data?.message ||
                     "Unable to load Favorites. Please try again."
                 );
+
             } finally {
                 setLoading(false);
             }
         };
 
         fetchFavorites();
+
     }, [refresh]);
 
     // Remove Favorite
@@ -259,7 +259,6 @@ function Favorites() {
                 ) : (
 
                     <>
-                        {/* FAVORITES GRID */}
                         {favorites.length > 0 ? (
 
                             <div className="books-grid">
@@ -279,25 +278,9 @@ function Favorites() {
                                             key={favorite._id}
                                         >
 
-                                            {/* BOOK COVER */}
+                                            {/* BOOK ICON - NO COVER IMAGE */}
                                             <div className="book-image">
-
-                                                {book.coverImage ? (
-
-                                                    <img
-                                                        src={`${API_URL}${book.coverImage}`}
-                                                        alt={book.title}
-                                                        onError={(e) => {
-                                                            e.currentTarget.style.display = "none";
-                                                        }}
-                                                    />
-
-                                                ) : (
-
-                                                    <BookOpen size={55} />
-
-                                                )}
-
+                                                <BookOpen size={65} />
                                             </div>
 
                                             {/* BOOK DETAILS */}
@@ -350,7 +333,6 @@ function Favorites() {
 
                         ) : (
 
-                            /* EMPTY FAVORITES */
                             <div className="empty-books">
 
                                 <Heart size={55} />

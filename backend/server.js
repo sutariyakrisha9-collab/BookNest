@@ -1,3 +1,4 @@
+
 require("dotenv").config();
 
 const express = require("express");
@@ -10,10 +11,9 @@ const bookRoutes = require("./routes/bookRoutes");
 const issueRoutes = require("./routes/issueRoutes");
 const favoriteRoutes = require("./routes/favoriteRoutes");
 
-
 const app = express();
 
-// 1. CORS Middleware (Must be before routes)
+// 1. CORS Middleware
 app.use(cors({
 
     origin: process.env.CLIENT_URL || "http://localhost:5173",
@@ -25,17 +25,16 @@ app.use(cors({
 // 2. Body Parser
 app.use(express.json());
 
-// 3. Static File Uploads
-app.use("/uploads", express.static("uploads"));
-
-// 4. API Routes
+// 3. API Routes
 app.use("/api/auth", authRoutes);
 
 app.use("/api/books", bookRoutes);
+
 app.use("/api/issues", issueRoutes);
+
 app.use("/api/favorites", favoriteRoutes);
 
-// 5. Home Route
+// 4. Home Route
 app.get("/", (req, res) => {
 
     res.status(200).json({
@@ -48,7 +47,7 @@ app.get("/", (req, res) => {
 
 });
 
-// 6. API Test Route
+// 5. API Test Route
 app.get("/api", (req, res) => {
 
     res.status(200).json({
@@ -61,7 +60,7 @@ app.get("/api", (req, res) => {
 
 });
 
-// 7. 404 Error Handler
+// 6. 404 Error Handler
 app.use((req, res) => {
 
     res.status(404).json({
@@ -74,7 +73,7 @@ app.use((req, res) => {
 
 });
 
-// 8. Server and Database
+// 7. Server and Database
 const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {

@@ -4,8 +4,6 @@ const router = express.Router();
 
 const protect = require("../middleware/authMiddleware");
 
-const upload = require("../middleware/uploadMiddleware");
-
 const {
     addBook,
     getBooks,
@@ -23,15 +21,9 @@ const validateBook = (req, res, next) => {
 
     if (!errors.isEmpty()) {
 
-        if (req.file) {
-            require("fs").unlinkSync(req.file.path);
-        }
-
         return res.status(400).json({
-
             success: false,
             errors: errors.array()
-
         });
 
     }
@@ -40,12 +32,10 @@ const validateBook = (req, res, next) => {
 
 };
 
-
 // Add Book
 router.post(
     "/",
     protect,
-    upload.single("coverImage"),
     [
         body("title")
             .trim()
@@ -76,20 +66,16 @@ router.post(
     addBook
 );
 
-
 // Get All Books
 router.get("/", protect, getBooks);
 
-
 // Get Single Book
 router.get("/:id", protect, getBookById);
-
 
 // Update Book
 router.put(
     "/:id",
     protect,
-    upload.single("coverImage"),
     [
         body("title")
             .optional()
@@ -118,9 +104,7 @@ router.put(
     updateBook
 );
 
-
 // Delete Book
 router.delete("/:id", protect, deleteBook);
-
 
 module.exports = router;

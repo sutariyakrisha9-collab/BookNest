@@ -1,6 +1,5 @@
+
 const Book = require("../models/Book");
-const fs = require("fs");
-const path = require("path");
 
 // ADD BOOK
 exports.addBook = async (req, res) => {
@@ -30,10 +29,6 @@ exports.addBook = async (req, res) => {
 
             totalCopies: copies,
             availableCopies: copies,
-
-            coverImage: req.file
-                ? `/uploads/books/${req.file.filename}`
-                : "",
 
             userId: req.user._id
 
@@ -80,9 +75,7 @@ exports.getBooks = async (req, res) => {
         );
 
         const query = {
-
             userId: req.user._id
-
         };
 
         // Search
@@ -248,44 +241,28 @@ exports.updateBook = async (req, res) => {
             const newTotal = Number(totalCopies);
 
             if (!Number.isInteger(newTotal) || newTotal < 1) {
+
                 return res.status(400).json({
                     success: false,
                     message: "Total copies must be at least 1"
                 });
+
             }
 
             const issuedCopies =
                 book.totalCopies - book.availableCopies;
 
             if (newTotal < issuedCopies) {
+
                 return res.status(400).json({
                     success: false,
                     message: "Total copies cannot be less than issued copies"
                 });
+
             }
 
             book.totalCopies = newTotal;
             book.availableCopies = newTotal - issuedCopies;
-
-        }
-
-        if (req.file) {
-
-            if (book.coverImage) {
-
-                const oldImagePath = path.join(
-                    process.cwd(),
-                    book.coverImage.replace(/^\/+/, "")
-                );
-
-                if (fs.existsSync(oldImagePath)) {
-                    fs.unlinkSync(oldImagePath);
-                }
-
-            }
-
-            book.coverImage =
-                `/uploads/books/${req.file.filename}`;
 
         }
 
@@ -329,19 +306,6 @@ exports.deleteBook = async (req, res) => {
                 success: false,
                 message: "Book not found"
             });
-
-        }
-
-        if (book.coverImage) {
-
-            const imagePath = path.join(
-                process.cwd(),
-                book.coverImage.replace(/^\/+/, "")
-            );
-
-            if (fs.existsSync(imagePath)) {
-                fs.unlinkSync(imagePath);
-            }
 
         }
 

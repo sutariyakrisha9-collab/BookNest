@@ -1,3 +1,4 @@
+
 const mongoose = require("mongoose");
 
 const bookSchema = new mongoose.Schema({
@@ -47,11 +48,6 @@ const bookSchema = new mongoose.Schema({
         type: Number,
         default: 1,
         min: 0
-    },
-
-    coverImage: {
-        type: String,
-        default: ""
     },
 
     userId: {

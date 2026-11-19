@@ -14,7 +14,6 @@ import {
     Pencil,
     Trash2,
     X,
-    Upload,
     ChevronLeft,
     ChevronRight,
     RefreshCw
@@ -44,7 +43,6 @@ function Dashboard({ view = "dashboard" }) {
     const [editingBook, setEditingBook] = useState(null);
     const [saving, setSaving] = useState(false);
     const [formError, setFormError] = useState("");
-    const [selectedImage, setSelectedImage] = useState(null);
 
     const [form, setForm] = useState({
         title: "",
@@ -55,9 +53,6 @@ function Dashboard({ view = "dashboard" }) {
         publishedYear: "",
         totalCopies: "1"
     });
-
-    const API_URL =
-        import.meta.env.VITE_API_URL || "http://localhost:5000";
 
     // Load User
     useEffect(() => {
@@ -129,7 +124,7 @@ function Dashboard({ view = "dashboard" }) {
 
     }, [refresh]);
 
-    // Check whether a book is already favorite
+    // Check Favorite
     const isFavorite = (bookId) => {
         return favorites.some((favorite) => {
             const favoriteBookId =
@@ -141,7 +136,7 @@ function Dashboard({ view = "dashboard" }) {
         });
     };
 
-    // Available Copies on Current Page
+    // Available Copies
     const availableCopies = books.reduce(
         (total, book) =>
             total + Number(book.availableCopies || 0),
@@ -160,7 +155,6 @@ function Dashboard({ view = "dashboard" }) {
             totalCopies: "1"
         });
 
-        setSelectedImage(null);
         setEditingBook(null);
         setFormError("");
     };
@@ -185,7 +179,6 @@ function Dashboard({ view = "dashboard" }) {
             totalCopies: String(book.totalCopies || 1)
         });
 
-        setSelectedImage(null);
         setFormError("");
         setShowModal(true);
     };
@@ -196,26 +189,6 @@ function Dashboard({ view = "dashboard" }) {
             ...form,
             [e.target.name]: e.target.value
         });
-    };
-
-    // Handle Book Cover Image
-    const handleImage = (e) => {
-        const file = e.target.files?.[0];
-
-        if (!file) return;
-
-        if (!file.type.startsWith("image/")) {
-            setFormError("Please select a valid image.");
-            return;
-        }
-
-        if (file.size > 2 * 1024 * 1024) {
-            setFormError("Image size must be less than 2 MB.");
-            return;
-        }
-
-        setSelectedImage(file);
-        setFormError("");
     };
 
     // Add or Update Book
@@ -237,28 +210,20 @@ function Dashboard({ view = "dashboard" }) {
         setSaving(true);
 
         try {
-            const formData = new FormData();
-
-            Object.entries(form).forEach(([key, value]) => {
-                if (value !== "") {
-                    formData.append(key, value);
-                }
-            });
-
-            if (selectedImage) {
-                formData.append("coverImage", selectedImage);
-            }
+            const bookData = {
+                ...form
+            };
 
             if (editingBook) {
                 await API.put(
                     `/books/${editingBook._id}`,
-                    formData
+                    bookData
                 );
 
                 alert("Book updated successfully!");
 
             } else {
-                await API.post("/books", formData);
+                await API.post("/books", bookData);
 
                 alert("Book added successfully!");
             }
@@ -478,10 +443,9 @@ function Dashboard({ view = "dashboard" }) {
 
                 </div>
 
-                {/* DASHBOARD ONLY CONTENT */}
+                {/* DASHBOARD CONTENT */}
                 {!isMyBooksPage && (
                     <>
-                        {/* WELCOME BANNER */}
                         <div className="welcome-banner">
 
                             <div>
@@ -505,7 +469,6 @@ function Dashboard({ view = "dashboard" }) {
 
                         </div>
 
-                        {/* STATISTICS */}
                         <h5 className="section-heading">
                             Library Overview
                         </h5>
@@ -552,7 +515,7 @@ function Dashboard({ view = "dashboard" }) {
                     </>
                 )}
 
-                {/* BOOK COLLECTION HEADING */}
+                {/* BOOK COLLECTION */}
                 <div className="books-heading">
 
                     <div>
@@ -579,7 +542,7 @@ function Dashboard({ view = "dashboard" }) {
 
                 </div>
 
-                {/* SEARCH AND CATEGORY FILTER */}
+                {/* SEARCH AND FILTER */}
                 <div className="book-filters">
 
                     <div className="search-box">
@@ -635,7 +598,7 @@ function Dashboard({ view = "dashboard" }) {
 
                 </div>
 
-                {/* BOOK COUNT ON MY BOOKS PAGE */}
+                {/* BOOK COUNT */}
                 {isMyBooksPage && !loading && !error && (
                     <p className="text-muted small mb-3">
                         Showing {books.length} books on this page
@@ -658,7 +621,6 @@ function Dashboard({ view = "dashboard" }) {
                     </div>
                 ) : (
                     <>
-                        {/* BOOK GRID */}
                         {books.length > 0 ? (
 
                             <div className="books-grid">
@@ -670,20 +632,10 @@ function Dashboard({ view = "dashboard" }) {
                                         key={book._id}
                                     >
 
-                                        {/* BOOK COVER */}
+                                        {/* BOOK ICON - NO COVER IMAGE */}
                                         <div className="book-image">
 
-                                            {book.coverImage ? (
-                                                <img
-                                                    src={`${API_URL}${book.coverImage}`}
-                                                    alt={book.title}
-                                                    onError={(e) => {
-                                                        e.currentTarget.style.display = "none";
-                                                    }}
-                                                />
-                                            ) : (
-                                                <BookOpen size={55} />
-                                            )}
+                                            <BookOpen size={65} />
 
                                             {/* FAVORITE HEART */}
                                             <button
@@ -774,7 +726,6 @@ function Dashboard({ view = "dashboard" }) {
 
                         ) : (
 
-                            /* EMPTY BOOKS */
                             <div className="empty-books">
 
                                 <BookOpen size={55} />
@@ -868,7 +819,6 @@ function Dashboard({ view = "dashboard" }) {
 
                     <div className="book-modal">
 
-                        {/* MODAL HEADER */}
                         <div className="modal-heading">
 
                             <div>
@@ -896,7 +846,6 @@ function Dashboard({ view = "dashboard" }) {
 
                         </div>
 
-                        {/* FORM ERROR */}
                         {formError && (
                             <div className="alert alert-danger">
                                 {formError}
@@ -956,37 +905,14 @@ function Dashboard({ view = "dashboard" }) {
                                             Select Category
                                         </option>
 
-                                        <option value="Fiction">
-                                            Fiction
-                                        </option>
-
-                                        <option value="Non-Fiction">
-                                            Non-Fiction
-                                        </option>
-
-                                        <option value="Education">
-                                            Education
-                                        </option>
-
-                                        <option value="Technology">
-                                            Technology
-                                        </option>
-
-                                        <option value="Self Help">
-                                            Self Help
-                                        </option>
-
-                                        <option value="Finance">
-                                            Finance
-                                        </option>
-
-                                        <option value="Science">
-                                            Science
-                                        </option>
-
-                                        <option value="History">
-                                            History
-                                        </option>
+                                        <option value="Fiction">Fiction</option>
+                                        <option value="Non-Fiction">Non-Fiction</option>
+                                        <option value="Education">Education</option>
+                                        <option value="Technology">Technology</option>
+                                        <option value="Self Help">Self Help</option>
+                                        <option value="Finance">Finance</option>
+                                        <option value="Science">Science</option>
+                                        <option value="History">History</option>
                                     </select>
                                 </div>
 
@@ -1057,38 +983,6 @@ function Dashboard({ view = "dashboard" }) {
                                     onChange={handleChange}
                                     placeholder="Enter book description"
                                 ></textarea>
-
-                            </div>
-
-                            {/* BOOK COVER UPLOAD */}
-                            <div className="mt-3">
-
-                                <label className="form-label">
-                                    Book Cover Image
-                                </label>
-
-                                <label className="upload-area">
-
-                                    <Upload size={25} />
-
-                                    <span>
-                                        {selectedImage
-                                            ? selectedImage.name
-                                            : "Click to upload JPG, PNG or WEBP"}
-                                    </span>
-
-                                    <small>
-                                        Maximum image size: 2 MB
-                                    </small>
-
-                                    <input
-                                        type="file"
-                                        accept="image/jpeg,image/png,image/webp"
-                                        onChange={handleImage}
-                                        hidden
-                                    />
-
-                                </label>
 
                             </div>
 
