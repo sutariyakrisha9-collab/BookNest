@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import API from "../services/api";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 import {
     BookOpen,
@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 
 function Dashboard({ view = "dashboard" }) {
-
+const navigate = useNavigate();
     const isMyBooksPage = view === "my-books";
 
     const [user, setUser] = useState({});
@@ -319,12 +319,14 @@ function Dashboard({ view = "dashboard" }) {
     };
 
     // Logout
-    const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
+  const handleLogout = () => {
 
-        window.location.replace("/login");
-    };
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    navigate("/login", { replace: true });
+
+};
 
     // Reset Filters
     const resetFilters = () => {
